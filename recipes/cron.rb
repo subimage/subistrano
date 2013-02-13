@@ -11,12 +11,15 @@ namespace :cron do
       current_cron = ""
     end
     
-    app_cron = ERB.new(
-      File.read("./config/deploy/crontab.erb")
-    ).result(binding)
-    
     str_cron_begin = "# begin #{application}"
     str_cron_end   = "# end #{application}"
+    
+    app_cron = ""
+    app_cron << str_cron_begin
+    app_cron << ERB.new(
+      File.read("./config/deploy/crontab.erb")
+    ).result(binding)
+    app_cron << str_cron_end
     
     if current_cron.index(str_cron_begin)
       new_cron = current_cron.gsub(
