@@ -5,8 +5,8 @@ require 'erb'
 namespace :monit do
   desc "Stop monit"
   task :stop, :roles => [:app] do
+    sudo "/usr/bin/monit -g #{application} stop all"
     sudo "/etc/init.d/monit stop"
-    sudo "/usr/sbin/monit -g #{application} stop all"
   end
 
   desc "Start monit"
