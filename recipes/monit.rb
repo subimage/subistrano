@@ -12,12 +12,13 @@ namespace :monit do
   desc "Start monit"
   task :start, :roles => [:app] do
     sudo "/etc/init.d/monit start"
+    sudo "/usr/bin/monit -g #{application} start all"
   end
 
   desc "Restart monit"
   task :restart, :roles => [:app] do
     stop
-    run  "sleep 10"
+    run  "sleep 2"
     start
   end
   
@@ -30,7 +31,5 @@ namespace :monit do
     put monit_conf, "#{application}_monit.conf"
     sudo "mv #{application}_monit.conf #{conf_dir}/#{application}"
     sudo "chown root:root #{conf_dir}/#{application}"
-    
-    restart
   end
 end
