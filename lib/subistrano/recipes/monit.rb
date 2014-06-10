@@ -25,13 +25,13 @@ Capistrano::Configuration.instance.load do
     
     desc "Uploads monit configuration file as /etc/monit/(application name)"
     task :upload_config, :roles => [:app] do
-      conf_dir = "/etc/monit/conf"
+      conf_dir = "/etc/monit/conf.d"
       monit_conf = ERB.new(
         File.read("./config/deploy/monit.erb")
       ).result(binding)
       put monit_conf, "#{application}_monit.conf"
-      sudo "mv #{application}_monit.conf #{conf_dir}/#{application}"
-      sudo "chown root:root #{conf_dir}/#{application}"
+      sudo "mv #{application}_monit.conf #{conf_dir}"
+      sudo "chown root:root #{conf_dir}"
     end
   end
 end
