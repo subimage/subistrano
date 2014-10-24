@@ -1,4 +1,8 @@
-Capistrano::Configuration.instance.load do
+configuration = Capistrano::Configuration.respond_to?(:instance) ?
+  Capistrano::Configuration.instance(:must_exist) :
+  Capistrano.configuration(:must_exist)
+
+configuration.load do
   namespace :deploy do  
     # Renders custom maintenance page on the server.
     #

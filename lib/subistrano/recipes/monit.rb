@@ -1,4 +1,8 @@
-Capistrano::Configuration.instance.load do
+configuration = Capistrano::Configuration.respond_to?(:instance) ?
+  Capistrano::Configuration.instance(:must_exist) :
+  Capistrano.configuration(:must_exist)
+
+configuration.load do
   require 'erb'
 
   # We use monit to manage backgroundrb on the server.

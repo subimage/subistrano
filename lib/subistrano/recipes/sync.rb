@@ -1,4 +1,8 @@
-Capistrano::Configuration.instance.load do
+configuration = Capistrano::Configuration.respond_to?(:instance) ?
+  Capistrano::Configuration.instance(:must_exist) :
+  Capistrano.configuration(:must_exist)
+
+configuration.load do
   namespace :sync do
     
     desc "Mirrors the remote shared public directory with your local copy, doesn't download symlinks"
