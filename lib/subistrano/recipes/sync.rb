@@ -26,7 +26,12 @@ configuration.load do
       filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
       server_dump_file = "#{current_path}/tmp/#{filename}"
       on_rollback { delete server_dump_file }
-      run "mysqldump -h #{prod_config['production']['host']} -u #{prod_config['production']['username']} --password=#{prod_config['production']['password']} #{prod_config['production']['database']} | gzip > #{server_dump_file}" do |channel, stream, data|
+      if prod_host = prod_config['production']['host']
+        host_str = "-h #{prod_config['production']['host']}"
+      else
+        host_str = ''
+      end
+      run "mysqldump #{host_str} -u #{prod_config['production']['username']} --password='#{prod_config['production']['password']}' #{prod_config['production']['database']} | gzip > #{server_dump_file}" do |channel, stream, data|
         puts data
       end
       
