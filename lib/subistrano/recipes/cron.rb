@@ -8,7 +8,7 @@ configuration.load do
   namespace :cron do
     
     desc "Updates CRON maintenance task on primary app server. Looks for file in ./config/deploy/crontab.erb"
-    task :upload_config, :roles => [:app], :only => { :primary => true } do
+    task :upload_config, :roles => [:util], :only => { :primary => true } do
       # If there's no crontab an exception will be thrown
       begin
         current_cron = capture "crontab -l"
