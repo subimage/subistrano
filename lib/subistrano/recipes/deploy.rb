@@ -19,7 +19,7 @@ configuration.load do
       
       desc "Removes maint page"
       task :enable, :roles => :web do
-        run "rm #{shared_path}/system/maintenance.html"
+        run "rm #{shared_path}/system/maintenance.html; true"
       end
     end
 
