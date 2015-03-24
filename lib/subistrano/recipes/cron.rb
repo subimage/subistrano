@@ -25,7 +25,7 @@ configuration.load do
         File.read("./config/deploy/crontab.erb")
       ).result(binding)
       app_cron << str_cron_end
-      
+
       if current_cron.index(str_cron_begin)
         new_cron = current_cron.gsub(
           /^#{str_cron_begin}.*#{str_cron_end}$/m,
@@ -34,7 +34,9 @@ configuration.load do
       else
         new_cron = current_cron << app_cron
       end
-      
+      # Remove carriage returns which can fuck up crontab
+      new_cron.gsub!(/\r/, '')
+
       # Upload edited crontab & install on server
       put new_cron, 'crontab.new'
       run 'crontab crontab.new'
