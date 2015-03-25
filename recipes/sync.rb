@@ -21,16 +21,20 @@ namespace :sync do
     filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
     server_dump_file = "#{current_path}/tmp/#{filename}"
     on_rollback { delete server_dump_file }
-    run "mysqldump -h #{prod_config['production']['host']} -u #{prod_config['production']['username']} --password=#{prod_config['production']['password']} #{prod_config['production']['database']} | gzip > #{server_dump_file}" do |channel, stream, data|
-      puts data
-    end
+
+    auth_args = "-h #{prod_config['production']['host']} -u #{prod_config['production']['username']} --password='#{prod_config['production']['password']}'"
+    sql_args = "--add-drop-table --extended-insert --create-options --quick --single-transaction --no-autocommit --lock-tables=false"
+    dump_command = "mysqldump #{auth_args} #{sql_args} #{prod_config['production']['database']}"
+    run "#{dump_command} |pv | gzip > #{server_dump_file}" do |channel, stream, data|
+      puts stream
+    end 
     
-    get "#{server_dump_file}", "tmp/#{filename}"
+    get "#{server_dump_file}", "tmp/#{filename}", :via => :scp
     
     puts "Uncompressing & loading locally..."
-    `gunzip < tmp/#{filename} | mysql -u #{local_config['development']['username']} --password=#{local_config['development']['password']} #{local_config['development']['database']}`
+    run_locally "gzcat tmp/#{filename} |pv | mysql -u #{local_config['development']['username']} --password=#{local_config['development']['password']} #{local_config['development']['database']}"
     puts "Cleaning up temp files"
-    `rm -f tmp/#{filename}`
-    `rm -f tmp/prod_database.yml`
+    run_locally "rm -f tmp/#{filename}"
+    run_locally "rm -f tmp/prod_database.yml"
   end
 end
